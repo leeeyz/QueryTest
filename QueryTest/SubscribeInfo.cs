@@ -16,11 +16,18 @@ namespace MyHelper.Common
         string keyname = "key:{0}";
         string sumkeyname = "sumkey";
         int limit;
+        private static readonly object Locker = new object();
 
         public SubscribeInfo(int limit)
         {
-            redis = new RedisHelper(1);
-            this.limit = limit;
+            if (redis == null)
+            {
+                lock (Locker)
+                {
+                    redis = new RedisHelper(1);
+                    this.limit = limit;
+                }
+            }
         }
 
         public void Subscribe(Action<MQMessage> action)
