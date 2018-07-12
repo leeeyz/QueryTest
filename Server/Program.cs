@@ -13,9 +13,9 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            SubscribeInfo subscribeInfo = new SubscribeInfo(1);
+            SubscribeInfo subscribeInfo = new SubscribeInfo(100);
 
-            Parallel.For(0, 99, i =>
+            Parallel.For(0, 999, i =>
             {
                 bool re = subscribeInfo.Incr(i.ToString());
                 Console.WriteLine("{0},{1}", i, re);

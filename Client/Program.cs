@@ -14,7 +14,7 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            SubscribeInfo subscribeInfo = new SubscribeInfo(1);
+            SubscribeInfo subscribeInfo = new SubscribeInfo(100);
 
             //subscribeInfo.Subscribe(mqmessage =>
             //{
@@ -31,17 +31,16 @@ namespace Client
             {
                 await Task.Run(() =>
                 {
-                    //Thread.Sleep(10 * 1000);
-                    throw new Exception("1324352");
+                    Console.WriteLine("处理日志{0}", mqmessage.Msg);
                 });
             });
-            subscribeInfo.ErrorHandle(async (dyc, expc, type) =>
-            {
-                await Task.Run(() =>
-                {
-                    Console.WriteLine("{0},{1}, {2}", dyc, expc.InnerException.Message, type);
-                });
-            });
+            //subscribeInfo.ErrorHandle(async (dyc, expc, type) =>
+            //{
+            //    await Task.Run(() =>
+            //    {
+            //        Console.WriteLine("{0},{1}, {2}", dyc, expc.InnerException.Message, type);
+            //    });
+            //});
 
 
             Console.ReadKey();

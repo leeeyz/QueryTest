@@ -66,6 +66,11 @@ namespace MyHelper.Common
             return false;
         }
 
+        public bool IsFulled()
+        {
+            return redis.StringGet<int>("sumkey") >= limit;
+        }
+
         public void RedisFlush()
         {
             redis.Flush();
