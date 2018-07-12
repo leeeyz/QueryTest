@@ -35,14 +35,14 @@ namespace Client
                     throw new Exception("1324352");
                 });
             });
-            //subscribeInfo.ErrorHandle(async (dyc, expc) => {
-            //    await Task.Run(() =>
-            //    {
-            //        Console.WriteLine("{0},{1}", dyc, expc.InnerException.Message);
-            //    });
-            //});
+            subscribeInfo.ErrorHandle(async (dyc, expc) =>
+            {
+                await Task.Run(() =>
+                {
+                    Console.WriteLine("{0},{1}", dyc, expc.InnerException.Message);
+                });
+            });
 
-            subscribeInfo.ErrorHandle(null);
 
             Console.ReadKey();
         }

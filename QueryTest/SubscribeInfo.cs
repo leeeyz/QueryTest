@@ -37,14 +37,12 @@ namespace MyHelper.Common
 
         public void ErrorHandle(Action<dynamic, Exception> action)
         {
-            if (action != null)
-                MQHelper.ErrorHandle(action);
+            MQHelper.ErrorHandle(action);
         }
 
         public void ErrorHandle(Func<dynamic, Exception, Task> func)
         {
-            if(func!=null)
-                MQHelper.ErrorHandle(func);
+            MQHelper.ErrorHandle(func);
         }
 
         public bool Incr(string id)
