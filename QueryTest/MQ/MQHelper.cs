@@ -1,5 +1,7 @@
 ﻿using EasyNetQ;
 using EasyNetQ.Consumer;
+using EasyNetQ.SystemMessages;
+using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -40,7 +42,63 @@ namespace MyHelper.Common.MQ
 
         private static IBus GetManager()
         {
-            return RabbitHutch.CreateBus(MQConnectionString, serviceRegister => serviceRegister.Register<IConsumerErrorStrategy, DeadLetterStrategy>());
+            var bus = RabbitHutch.CreateBus(MQConnectionString, serviceRegister => serviceRegister.Register<IConsumerErrorStrategy, DeadLetterStrategy>());
+            return bus;
+        }
+
+        public static void ErrorHandle(Action<dynamic, Exception> act)
+        {
+            string errorQueue = "EasyNetQ_Default_Error_Queue";
+            var subscriptionErrorQueue = _instance.Advanced.QueueDeclare(errorQueue);
+            var source = _instance.Advanced.ExchangeDeclare(errorQueue, "direct");
+            _instance.Advanced.Bind(source, subscriptionErrorQueue, "#");
+            _instance.Advanced.Consume<Error>(subscriptionErrorQueue, (error, info) => {
+                Type originalMsgType = null;
+
+                if (error.Body.BasicProperties.TypePresent)
+                {
+                    var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
+                    originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
+                }
+                else
+                {
+
+                }
+
+                dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
+
+                Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
+
+                act(originalMessage, expc);
+            });
+        }
+
+        public static void ErrorHandle(Func<dynamic, Exception, Task> func)
+        {
+            string errorQueue = "EasyNetQ_Default_Error_Queue";
+            var subscriptionErrorQueue = _instance.Advanced.QueueDeclare(errorQueue);
+            var source = _instance.Advanced.ExchangeDeclare(errorQueue, "direct");
+            _instance.Advanced.Bind(source, subscriptionErrorQueue, "#");
+            _instance.Advanced.Consume<Error>(subscriptionErrorQueue, async (error, info) =>
+            {
+                Type originalMsgType = null;
+
+                if (error.Body.BasicProperties.TypePresent)
+                {
+                    var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
+                    originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
+                }
+                else
+                {
+
+                }
+
+                dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
+
+                Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
+
+                await func(originalMessage, expc);
+            });
         }
 
         public static void Dispose()
@@ -59,7 +117,8 @@ namespace MyHelper.Common.MQ
 
         public override AckStrategy HandleConsumerError(ConsumerExecutionContext context, Exception exception)
         {
-            return AckStrategies.Ack;
+            context.Properties.Headers.Add("expc", exception);
+            return base.HandleConsumerError(context, exception);
         }
     }
 }

@@ -35,7 +35,9 @@ namespace Client
                     throw new Exception("1324352");
                 });
             });
-
+            subscribeInfo.ErrorHandle((mqmessage, expc) => {
+                Console.WriteLine("{0},{1}", mqmessage, expc.InnerException.Message);
+            });
 
             Console.ReadKey();
         }

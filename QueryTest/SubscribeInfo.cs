@@ -25,18 +25,22 @@ namespace MyHelper.Common
 
         public void Subscribe(Action<MQMessage> action)
         {
-            if (action != null)
-            {
-                MQHelper.Instance.Subscribe(mqChannel, action);
-            }
+            MQHelper.Instance.Subscribe(mqChannel, action);
         }
 
         public void Subscribe(Func<MQMessage, Task> func)
         {
-            if (func != null)
-            {
-                MQHelper.Instance.SubscribeAsync(mqChannel, func);
-            }
+            MQHelper.Instance.SubscribeAsync(mqChannel, func);
+        }
+
+        public void ErrorHandle(Action<dynamic, Exception> act)
+        {
+            MQHelper.ErrorHandle(act);
+        }
+
+        public void ErrorHandle(Func<dynamic, Exception, Task> func)
+        {
+            MQHelper.ErrorHandle(func);
         }
 
         public bool Incr(string id)
