@@ -14,7 +14,7 @@ namespace Client
     {
         static void Main(string[] args)
         {
-            SubscribeInfo subscribeInfo = new SubscribeInfo(100);
+            SubscribeInfo subscribeInfo = new SubscribeInfo(10);
 
             //subscribeInfo.Subscribe(mqmessage =>
             //{
@@ -31,7 +31,7 @@ namespace Client
             {
                 await Task.Run(() =>
                 {
-                    Console.WriteLine("处理日志{0}", mqmessage.Msg);
+                    Console.WriteLine("处理日志:{0}", mqmessage.Msg);
                 });
             });
             //subscribeInfo.ErrorHandle(async (dyc, expc, type) =>

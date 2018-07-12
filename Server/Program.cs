@@ -13,12 +13,12 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            SubscribeInfo subscribeInfo = new SubscribeInfo(100);
+            SubscribeInfo subscribeInfo = new SubscribeInfo(10);
 
-            Parallel.For(0, 999, i =>
+            Parallel.For(0, 99, i =>
             {
                 bool re = subscribeInfo.Incr(i.ToString());
-                Console.WriteLine("{0},{1}", i, re);
+                Console.WriteLine("{0},{1},{2}", i, re, subscribeInfo.IsFulled());
             });
 
             subscribeInfo.RedisFlush();
