@@ -53,24 +53,33 @@ namespace MyHelper.Common.MQ
             var source = _instance.Advanced.ExchangeDeclare(errorQueue, "direct");
             _instance.Advanced.Bind(source, subscriptionErrorQueue, "#");
             _instance.Advanced.Consume<Error>(subscriptionErrorQueue, (error, info) => {
-                Type originalMsgType = null;
 
-                if (error.Body.BasicProperties.TypePresent)
-                {
-                    var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
-                    originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
-                }
-                else
+                try
                 {
 
+                    Type originalMsgType = null;
+
+                    if (error.Body.BasicProperties.TypePresent)
+                    {
+                        var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
+                        originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
+                    }
+                    else
+                    {
+
+                    }
+
+                    dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
+
+                    Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
+
+                    if (action != null)
+                        action(originalMessage, expc, originalMsgType);
                 }
+                catch(Exception ex)
+                {
 
-                dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
-
-                Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
-
-                if(action != null)
-                    action(originalMessage, expc, originalMsgType);
+                }
             });
         }
 
@@ -82,24 +91,32 @@ namespace MyHelper.Common.MQ
             _instance.Advanced.Bind(source, subscriptionErrorQueue, "#");
             _instance.Advanced.Consume<Error>(subscriptionErrorQueue, async (error, info) =>
             {
-                Type originalMsgType = null;
-
-                if (error.Body.BasicProperties.TypePresent)
+                try
                 {
-                    var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
-                    originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
+                    Type originalMsgType = null;
+
+                    if (error.Body.BasicProperties.TypePresent)
+                    {
+                        var typeNameSerializer = _instance.Advanced.Container.Resolve<ITypeNameSerializer>();
+                        originalMsgType = typeNameSerializer.DeSerialize(error.Body.BasicProperties.Type);
+                    }
+                    else
+                    {
+
+                    }
+
+                    dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
+
+                    Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
+
+                    if (func != null)
+                        await func(originalMessage, expc, originalMsgType);
+
                 }
-                else
+                catch (Exception ex)
                 {
 
                 }
-
-                dynamic originalMessage = JsonConvert.DeserializeObject(error.Body.Message, originalMsgType);
-
-                Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
-
-                if (func != null)
-                    await func(originalMessage, expc, originalMsgType);
             });
         }
 
@@ -119,13 +136,6 @@ namespace MyHelper.Common.MQ
 
         public override AckStrategy HandleConsumerError(ConsumerExecutionContext context, Exception exception)
         {
-            //string body = System.Text.Encoding.Default.GetString(context.Body);
-            //MQMessage mqMessage = JsonConvert.DeserializeObject<MQMessage>(body);
-            //return AckStrategies.Ack;
-
-
-
-
             context.Properties.Headers.Add("expc", exception);
             return base.HandleConsumerError(context, exception);
         }
