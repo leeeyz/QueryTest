@@ -46,7 +46,7 @@ namespace MyHelper.Common.MQ
             return bus;
         }
 
-        public static void ErrorHandle(Action<dynamic, Exception> action)
+        public static void ErrorHandle(Action<dynamic, Exception, Type> action)
         {
             string errorQueue = "EasyNetQ_Default_Error_Queue";
             var subscriptionErrorQueue = _instance.Advanced.QueueDeclare(errorQueue);
@@ -70,11 +70,11 @@ namespace MyHelper.Common.MQ
                 Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
 
                 if(action != null)
-                    action(originalMessage, expc);
+                    action(originalMessage, expc, originalMsgType);
             });
         }
 
-        public static void ErrorHandle(Func<dynamic, Exception, Task> func)
+        public static void ErrorHandle(Func<dynamic, Exception, Type, Task> func)
         {
             string errorQueue = "EasyNetQ_Default_Error_Queue";
             var subscriptionErrorQueue = _instance.Advanced.QueueDeclare(errorQueue);
@@ -99,7 +99,7 @@ namespace MyHelper.Common.MQ
                 Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
 
                 if (func != null)
-                    await func(originalMessage, expc);
+                    await func(originalMessage, expc, originalMsgType);
             });
         }
 
@@ -119,7 +119,13 @@ namespace MyHelper.Common.MQ
 
         public override AckStrategy HandleConsumerError(ConsumerExecutionContext context, Exception exception)
         {
-            string body = System.Text.Encoding.Default.GetString(context.Body);
+            //string body = System.Text.Encoding.Default.GetString(context.Body);
+            //MQMessage mqMessage = JsonConvert.DeserializeObject<MQMessage>(body);
+            //return AckStrategies.Ack;
+
+
+
+
             context.Properties.Headers.Add("expc", exception);
             return base.HandleConsumerError(context, exception);
         }

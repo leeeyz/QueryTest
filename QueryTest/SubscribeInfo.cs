@@ -35,12 +35,12 @@ namespace MyHelper.Common
                 MQHelper.Instance.SubscribeAsync(mqChannel, func);
         }
 
-        public void ErrorHandle(Action<dynamic, Exception> action)
+        public void ErrorHandle(Action<dynamic, Exception, Type> action)
         {
             MQHelper.ErrorHandle(action);
         }
 
-        public void ErrorHandle(Func<dynamic, Exception, Task> func)
+        public void ErrorHandle(Func<dynamic, Exception, Type, Task> func)
         {
             MQHelper.ErrorHandle(func);
         }
