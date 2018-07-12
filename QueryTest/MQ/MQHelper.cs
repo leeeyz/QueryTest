@@ -119,6 +119,7 @@ namespace MyHelper.Common.MQ
 
         public override AckStrategy HandleConsumerError(ConsumerExecutionContext context, Exception exception)
         {
+            string body = System.Text.Encoding.Default.GetString(context.Body);
             context.Properties.Headers.Add("expc", exception);
             return base.HandleConsumerError(context, exception);
         }
