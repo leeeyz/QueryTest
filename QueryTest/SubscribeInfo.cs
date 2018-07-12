@@ -27,7 +27,7 @@ namespace MyHelper.Common
         {
             if (action != null)
             {
-                MQConnectionHelp.Instance.Subscribe(mqChannel, action);
+                MQHelper.Instance.Subscribe(mqChannel, action);
             }
         }
 
@@ -35,7 +35,7 @@ namespace MyHelper.Common
         {
             if (func != null)
             {
-                MQConnectionHelp.Instance.SubscribeAsync(mqChannel, func);
+                MQHelper.Instance.SubscribeAsync(mqChannel, func);
             }
         }
 
@@ -46,7 +46,7 @@ namespace MyHelper.Common
             {
                 if (redis.StringIncrement(sumkeyname) <= limit)
                 {
-                    MQConnectionHelp.Instance.Publish(new MQMessage() { Msg = id });
+                    MQHelper.Instance.Publish(new MQMessage() { Msg = id });
                     return true;
                 }
             }
@@ -56,7 +56,7 @@ namespace MyHelper.Common
         public void Clear()
         {
             redis.Flush();
-            MQConnectionHelp.Instance.Dispose();
+            MQHelper.Instance.Dispose();
         }
     }
 }

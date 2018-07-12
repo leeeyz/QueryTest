@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MyHelper.Common.MQ
 {
-    public static class MQConnectionHelp
+    public static class MQHelper
     {
         private static readonly string MQConnectionString = ConfigurationManager.ConnectionStrings["MQConnection"].ConnectionString;
 
