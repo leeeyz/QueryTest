@@ -46,7 +46,7 @@ namespace MyHelper.Common.MQ
             return bus;
         }
 
-        public static void ErrorHandle(Action<dynamic, Exception> act)
+        public static void ErrorHandle(Action<dynamic, Exception> action)
         {
             string errorQueue = "EasyNetQ_Default_Error_Queue";
             var subscriptionErrorQueue = _instance.Advanced.QueueDeclare(errorQueue);
@@ -69,8 +69,8 @@ namespace MyHelper.Common.MQ
 
                 Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
 
-                if(act!=null)
-                    act(originalMessage, expc);
+                if(action != null)
+                    action(originalMessage, expc);
             });
         }
 
