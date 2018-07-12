@@ -34,7 +34,6 @@ namespace Client
                     //Thread.Sleep(10 * 1000);
                     throw new Exception("1324352");
                 });
-                Console.WriteLine("处理日志{0}", mqmessage.Msg);
             });
 
 
