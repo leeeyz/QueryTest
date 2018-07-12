@@ -11,7 +11,6 @@ namespace MyHelper.Common
     public class SubscribeInfo
     {
         RedisHelper redis;
-        MQHelper mq;
 
         string mqChannel = "mqChannel";
         string keyname = "key:{0}";
@@ -21,7 +20,6 @@ namespace MyHelper.Common
         public SubscribeInfo(int limit)
         {
             redis = new RedisHelper(1);
-            mq = new MQHelper();
             this.limit = limit;
         }
 
@@ -29,7 +27,7 @@ namespace MyHelper.Common
         {
             if (action != null)
             {
-                mq.Subscribe(mqChannel, action);
+                MQConnectionHelp.Instance.Subscribe(mqChannel, action);
             }
         }
 
@@ -37,7 +35,7 @@ namespace MyHelper.Common
         {
             if (func != null)
             {
-                mq.Subscribe(mqChannel, func);
+                MQConnectionHelp.Instance.SubscribeAsync(mqChannel, func);
             }
         }
 
@@ -48,7 +46,7 @@ namespace MyHelper.Common
             {
                 if (redis.StringIncrement(sumkeyname) <= limit)
                 {
-                    mq.Publish(new MQMessage() { Msg = id });
+                    MQConnectionHelp.Instance.Publish(new MQMessage() { Msg = id });
                     return true;
                 }
             }
@@ -58,7 +56,7 @@ namespace MyHelper.Common
         public void Clear()
         {
             redis.Flush();
-            mq.Dispose();
+            MQConnectionHelp.Instance.Dispose();
         }
     }
 }
