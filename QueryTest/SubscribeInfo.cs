@@ -57,10 +57,15 @@ namespace MyHelper.Common
             return false;
         }
 
-        public void Clear()
+        public void RedisFlush()
         {
             redis.Flush();
-            //MQHelper.Instance.Dispose();
+        }
+
+        public void Dispose()
+        {
+            redis.Flush();
+            MQHelper.Instance.Dispose();
         }
     }
 }

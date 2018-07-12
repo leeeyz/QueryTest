@@ -21,7 +21,7 @@ namespace Server
                 Console.WriteLine("{0},{1}", i, re);
             });
 
-            subscribeInfo.Clear();
+            subscribeInfo.RedisFlush();
             Console.ReadLine();
         }
     }
