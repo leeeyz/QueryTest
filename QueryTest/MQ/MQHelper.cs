@@ -69,7 +69,8 @@ namespace MyHelper.Common.MQ
 
                 Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
 
-                act(originalMessage, expc);
+                if(act!=null)
+                    act(originalMessage, expc);
             });
         }
 
@@ -97,7 +98,8 @@ namespace MyHelper.Common.MQ
 
                 Exception expc = error.Body.BasicProperties.Headers["expc"] as Exception;
 
-                await func(originalMessage, expc);
+                if (func != null)
+                    await func(originalMessage, expc);
             });
         }
 
