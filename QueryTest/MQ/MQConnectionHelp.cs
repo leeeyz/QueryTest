@@ -1,5 +1,7 @@
 ﻿using EasyNetQ;
+using EasyNetQ.Consumer;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -38,12 +40,44 @@ namespace MyHelper.Common.MQ
 
         private static IBus GetManager()
         {
-            return RabbitHutch.CreateBus(MQConnectionString);
+            return RabbitHutch.CreateBus(MQConnectionString, serviceRegister => serviceRegister.Register<IConsumerErrorStrategy, DeadLetterStrategy>());
         }
 
         public static void Dispose()
         {
             _instance.Dispose();
+        }
+    }
+
+    public class DeadLetterStrategy : DefaultConsumerErrorStrategy
+    {
+        public DeadLetterStrategy(IConnectionFactory connectionFactory, ISerializer serializer, IConventions conventions, ITypeNameSerializer typeNameSerializer, IErrorMessageSerializer errorMessageSerializer)
+        : base(connectionFactory, serializer, conventions, typeNameSerializer, errorMessageSerializer)
+        {
+        }
+
+
+        public override AckStrategy HandleConsumerError(ConsumerExecutionContext context, Exception exception)
+        {
+            object deathHeaderObject;
+            if (!context.Properties.Headers.TryGetValue("x-death", out deathHeaderObject))
+                return AckStrategies.NackWithoutRequeue;
+
+            var deathHeaders = deathHeaderObject as IList;
+
+            if (deathHeaders == null)
+                return AckStrategies.NackWithoutRequeue;
+
+            var retries = 0;
+            foreach (IDictionary header in deathHeaders)
+            {
+                var count = int.Parse(header["count"].ToString());
+                retries += count;
+            }
+
+            if (retries < 3)
+                return AckStrategies.NackWithoutRequeue;
+            return base.HandleConsumerError(context, exception);
         }
     }
 }

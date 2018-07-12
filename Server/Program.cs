@@ -13,7 +13,7 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            SubscribeInfo subscribeInfo = new SubscribeInfo(10);
+            SubscribeInfo subscribeInfo = new SubscribeInfo(1);
 
             Parallel.For(0, 99, i =>
             {
