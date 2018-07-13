@@ -23,6 +23,8 @@ namespace Test
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
+            LogHelper.LogInfo("123");
+
             SubscribeInfo.Subscribe(async mqmsg=> {
                 await Task.Run(() => {
                     LogHelper.LogInfo(mqmsg.Msg);
