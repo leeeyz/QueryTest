@@ -53,7 +53,7 @@ namespace MyHelper.Common
             MQHelper.ErrorHandle(func);
         }
 
-        public bool Incr(string id)
+        public int Incr(string id)
         {
             id = string.Format(keyname, id);
             if (redis.StringIncrement(id) == 1)
@@ -61,10 +61,17 @@ namespace MyHelper.Common
                 if (redis.StringIncrement(sumkeyname) <= limit)
                 {
                     MQHelper.Instance.Publish(new MQMessage() { Msg = id });
-                    return true;
+                    //成功
+                    return 0;
+                }
+                else
+                {
+                    //已满
+                    return 1;
                 }
             }
-            return false;
+            //已在队列
+            return 2;
         }
 
         public bool IsFulled()

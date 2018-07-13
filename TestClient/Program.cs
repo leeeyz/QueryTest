@@ -11,6 +11,18 @@ namespace TestClient
     {
         static void Main(string[] args)
         {
+            //Parallel.For(0, 1000, x =>
+            //{
+            //    HttpHelper helper = new HttpHelper(string.Format("http://localhost:52507/home/buy/{0}", x));
+            //    helper.OpenReadCompleted += (s, e) => {
+            //        using (var reader = new StreamReader(e.Result))
+            //        {
+            //            Console.WriteLine(reader.ReadToEnd());
+            //        }
+            //    };
+            //    helper.OpenReadAsync();
+            //});
+
             Parallel.For(0, 1000, x =>
             {
                 HttpHelper helper = new HttpHelper(string.Format("http://localhost:52507/home/buy/{0}", x));

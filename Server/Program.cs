@@ -17,7 +17,7 @@ namespace Server
 
             Parallel.For(0, 99, i =>
             {
-                bool re = subscribeInfo.Incr(i.ToString());
+                int re = subscribeInfo.Incr(i.ToString());
                 Console.WriteLine("{0},{1},{2}", i, re, subscribeInfo.IsFulled());
             });
 

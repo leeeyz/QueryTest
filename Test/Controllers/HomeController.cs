@@ -35,14 +35,18 @@ namespace Test.Controllers
             }
             else
             {
-                bool result = MvcApplication.SubscribeInfo.Incr(id);
-                if(result)
+                int result = MvcApplication.SubscribeInfo.Incr(id);
+                if(result == 0)
                 {
                     return new JsonResult() { Data = new { id = id, msg = "成功" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
-                else
+                else if (result == 1)
                 {
                     return new JsonResult() { Data = new { id = id, msg = "失败" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                }
+                else
+                {
+                    return new JsonResult() { Data = new { id = id, msg = "已在队列" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
             }
         }
