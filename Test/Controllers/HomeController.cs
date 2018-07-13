@@ -42,18 +42,18 @@ namespace Test.Controllers
                 }
                 else if (result == 1)
                 {
-                    return new JsonResult() { Data = new { id = id, msg = "失败" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    return new JsonResult() { Data = new { id = id, msg = "已在队列" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
                 else
                 {
-                    return new JsonResult() { Data = new { id = id, msg = "已在队列" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    return new JsonResult() { Data = new { id = id, msg = "失败" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
             }
         }
 
         public ActionResult Reset()
         {
-            MvcApplication.SubscribeInfo.ResetRedis();
+            MvcApplication.SubscribeInfo.RedisFlush();
             return new JsonResult() { Data = new { msg = "重设" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
         }
     }

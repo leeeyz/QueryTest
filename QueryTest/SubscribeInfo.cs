@@ -1,5 +1,6 @@
 ﻿using MyHelper.Common.MQ;
 using MyHelper.Common.Redis;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,8 +14,7 @@ namespace MyHelper.Common
         RedisHelper redis;
 
         string mqChannel = "mqChannel";
-        string keyname = "key:{0}";
-        string sumkeyname = "sumkey";
+        string listkeyname = "listkey";
         int limit;
         private static readonly object Locker = new object();
 
@@ -26,7 +26,6 @@ namespace MyHelper.Common
                 {
                     redis = new RedisHelper(1);
                     this.limit = limit;
-                    redis.StringSet<int>(sumkeyname, 0);
                 }
             }
         }
@@ -55,39 +54,41 @@ namespace MyHelper.Common
 
         public int Incr(string id)
         {
-            id = string.Format(keyname, id);
-            if (redis.StringIncrement(id) == 1)
+            var trans = redis.CreateTransaction();
+            trans.AddCondition(Condition.ListLengthLessThan(listkeyname, limit));
+            trans.AddCondition(Condition.KeyNotExists(id));
+            trans.ListRightPushAsync(listkeyname, id);
+            trans.StringIncrementAsync(id);
+            bool result = trans.Execute();
+            if(result)
             {
-                if (redis.StringIncrement(sumkeyname) <= limit)
+                MQHelper.Instance.Publish<MQMessage>(new MQMessage() { Msg = id });
+                //成功
+                return 0;
+            }
+            else
+            {
+                if (redis.KeyExists(id))
                 {
-                    MQHelper.Instance.Publish(new MQMessage() { Msg = id });
-                    //成功
-                    return 0;
+                    //已在队列
+                    return 1;
                 }
                 else
                 {
-                    //已满
-                    return 1;
+                    //失败
+                    return 2;
                 }
             }
-            //已在队列
-            return 2;
         }
 
         public bool IsFulled()
         {
-            return redis.StringGet<int>("sumkey") >= limit;
+            return redis.ListLength(listkeyname) == limit;
         }
 
         public void RedisFlush()
         {
             redis.Flush();
-        }
-
-        public void ResetRedis()
-        {
-            RedisFlush();
-            redis.StringSet<int>(sumkeyname, 0);
         }
 
         public void Dispose()
