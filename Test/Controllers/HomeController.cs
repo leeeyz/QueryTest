@@ -47,5 +47,11 @@ namespace Test.Controllers
                 }
             }
         }
+
+        public ActionResult Reset()
+        {
+            MvcApplication.SubscribeInfo.ResetRedis();
+            return new JsonResult() { Data = new { msg = "重设" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+        }
     }
 }

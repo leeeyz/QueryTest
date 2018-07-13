@@ -77,6 +77,12 @@ namespace MyHelper.Common
             redis.Flush();
         }
 
+        public void ResetRedis()
+        {
+            RedisFlush();
+            redis.StringSet<int>(sumkeyname, 0);
+        }
+
         public void Dispose()
         {
             redis.Flush();
