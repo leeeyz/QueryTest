@@ -26,6 +26,7 @@ namespace MyHelper.Common
                 {
                     redis = new RedisHelper(1);
                     this.limit = limit;
+                    redis.StringSet<int>(sumkeyname, 0);
                 }
             }
         }
