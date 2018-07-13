@@ -32,18 +32,18 @@ namespace Test.Controllers
             string guid = Guid.NewGuid().ToString();
             if(MvcApplication.SubscribeInfo.IsFulled())
             {
-                return new JsonResult() { Data = new { msg = "已经结束" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                return new JsonResult() { Data = new { gudi = guid,msg = "已经结束" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
             }
             else
             {
                 bool result = MvcApplication.SubscribeInfo.Incr(guid);
                 if(result)
                 {
-                    return new JsonResult() { Data = new { msg = "成功" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    return new JsonResult() { Data = new { gudi = guid, msg = "成功" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
                 else
                 {
-                    return new JsonResult() { Data = new { msg = "失败" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
+                    return new JsonResult() { Data = new { gudi = guid, msg = "失败" }, JsonRequestBehavior = JsonRequestBehavior.AllowGet };
                 }
             }
         }
